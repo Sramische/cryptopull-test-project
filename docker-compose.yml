@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  pg:
+    image: postgres:9.4
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: cryptopull_api/.
+    working_dir: /app
+    command: bundle exec rails s -p 8080 -b '0.0.0.0'
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./cryptopull_api:/app
+      - bundle:/bundle
+    ports:
+      - "8080:8080"
+    depends_on: 
+      - "pg"
+
+volumes:
+  pg-data:
+    driver: local
+  bundle:
+    driver: local
+  #web:
+  #  build: ./cryptopull-web
+
+
+
+

@@ -1,0 +1,11 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: pg
+  username: postgres
+  password:
+  pool: 5
+  database: cryptopull
+
+development:
+  <<: *default
