@@ -18,4 +18,24 @@ class HistoryEntry < ApplicationRecord
         
         connection.execute(sql)
     end
+
+    def self.get_coin_stats
+        sql = <<-SQL
+            SELECT DISTINCT ON(id) *,
+                (first_value(price) OVER day_window / last_value(price) OVER day_window) as change,
+                avg(price) OVER day_window AS price_avg
+            FROM (
+            SELECT *
+            FROM coin_history
+            WHERE updated >= EXTRACT(epoch FROM (localtimestamp - interval '24 hours'))
+            ) AS day_frame
+            WINDOW day_window AS (
+                PARTITION BY id 
+                ORDER BY updated DESC
+                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+            ) 
+        SQL
+
+        connection.execute(sql)
+    end
 end
